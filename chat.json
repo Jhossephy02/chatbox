@@ -1,0 +1,17 @@
+[
+  {
+    "fecha": "2025-10-31 16:35:24",
+    "usuario": "Hola, hola, hola, hola.",
+    "asistente": "Hola! ¿Cómo puedo asistirte hoy?"
+  },
+  {
+    "fecha": "2025-10-31 16:35:46",
+    "usuario": "hola como estas",
+    "asistente": "Hola, estoy bien gracias por preguntar. ¿Y tú cómo te va?"
+  },
+  {
+    "fecha": "2025-10-31 16:36:08",
+    "usuario": "me encuentro muy bien gracias que me cuentas",
+    "asistente": "Me alegra mucho escuchar que estés bien. Si tien endiosa necesita algo o más información, no dude en preguntarme. ¡Espero contarte más pronto!"
+  }
+]

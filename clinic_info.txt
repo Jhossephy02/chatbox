@@ -1,0 +1,11 @@
+Clinica VidaSalud
+Direccion : Av. Salud 123 , Pucallpa , Peru
+Telefono : (01) 555-1234
+Correo : cita@vidasalud.com
+Horarios  : Lunes a Viernes 8:00 - 18:00 , Sabados 9:00 - 13:00
+Especialidades : Medicina General , Pediatria , Ginecologia , Odontologia , Laboratorio
+Servicios Destacados :
+> Consulta medicas presenciales y virtuales
+> Servicios de lacoratorio general y estetica
+> Programas de prevencion y vacunacion 
+Formas de pago : EFECTIVO , tARJETA DE CREDITO ,  yape , plin , Transferencias
