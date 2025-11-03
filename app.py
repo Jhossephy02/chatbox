@@ -119,7 +119,7 @@ def responder_con_ollana(prompt, model_name="phi3"):
 # 1. Función para ElevenLabs (Prioridad 1)
 def generar_audio_tts_elevenlabs(texto):
     # Si la API key es el placeholder o está vacía, no intentes llamar a la API
-    if not ELEVENLABS_API_KEY or ELEVENLABS_API_KEY == 'TU_API_KEY_DE_ELEVENLABS_AQUI':
+    if not ELEVENLABS_API_KEY or ELEVENLABS_API_KEY == '8a0e5002acafa344bbe871dda4685fd0ef0f7663ae25cc9bb6c1bc5b1d51f133':
         print("API Key de ElevenLabs no configurada. Omitiendo.")
         return None
     
@@ -129,7 +129,7 @@ def generar_audio_tts_elevenlabs(texto):
     try:
         url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
         headers = {
-            "xi-api-key": ELEVENLABS_API_KEY,
+            "xi-api-key": ELEVENLABS_API_KEY, 
             "Content-Type": "application/json"
         }
         payload = {
