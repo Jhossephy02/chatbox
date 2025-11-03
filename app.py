@@ -18,10 +18,8 @@ TTS_FOLDER = 'tts'  # donde se guardan los audios generados por TTS
 CHAT_FILE = 'chat.json'  # archivo para historial de chat
 CLINIC_INFO_FILE = 'clinic_info.txt'  # archivo con info de la clínica
 
-# CAMBIO REQ 4: Configuración de ElevenLabs
-# !! IMPORTANTE: Reemplaza con tu clave de API real de ElevenLabs !!
-ELEVEN_API_KEY = '8a0e5002acafa344bbe871dda4685fd0ef0f7663ae25cc9bb6c1bc5b1d51f133'
-# Puedes encontrar IDs de voz aquí: https://api.elevenlabs.io/v1/voices
+# Configuración de ElevenLabs (NOMBRE CORREGIDO)
+ELEVENLABS_API_KEY = '8a0e5002acafa344bbe871dda4685fd0ef0f7663ae25cc9bb6c1bc5b1d51f133'
 VOICE_ID = '21m00Tcm4TlvDq8ikWAM'  # Voz predeterminada (Adam)
 ELEVEN_MODEL = 'eleven_multilingual_v2'  # Modelo actualizado para español
 
@@ -59,7 +57,7 @@ def cargar_info_clinica():
 # GUARDAR LOS CHAT GENERALES EN UN ARCHIVO JSON
 def guardar_chat_historial(usuario_text, asistente_text):
     entry = {
-        'fecha': datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+        'fecha': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         'usuario': usuario_text,
         'asistente': asistente_text,
     }
@@ -85,23 +83,17 @@ def guardar_chat_historial(usuario_text, asistente_text):
 
 # Conexión con Ollama
 def responder_con_ollana(prompt, model_name="phi3"):
-    # Cargar contexto de la clínica (si existe)
-    # info_clinica = cargar_info_clinica()
-    # prompt_contextual = f"Responde la siguiente pregunta basándote en esta información:\n---{info_clinica}---\n\nPregunta: {prompt}\n\nSi la respuesta no está en la información, responde normalmente."
-    
-    # Prompt simple (como estaba en el original)
+    # Prompt simple
     prompt_final = f"Por favor responde en español de forma concisa y amigable.\nUsuario: {prompt}\nAsistente:"
     
     try:
         response = requests.post(
             "http://localhost:11434/api/generate",
-            json={"model": model_name, "prompt": prompt_final, "max_tokens": 512, "stream": False}, # Stream=False para respuesta completa
+            json={"model": model_name, "prompt": prompt_final, "stream": False},
             timeout=60
         )
         
-        response.raise_for_status() # Lanza error si la respuesta no es 200
-        
-        # Con stream=False, la respuesta es un JSON completo
+        response.raise_for_status()
         data = response.json()
         full_text = data.get('response', '').strip()
         
@@ -114,12 +106,12 @@ def responder_con_ollana(prompt, model_name="phi3"):
     except Exception as e:
         return f"Error al conectar con Ollama: {e}"
 
-# --- CAMBIO REQ 4: FUNCIONES DE TEXT-TO-SPEECH (TTS) ---
+# --- FUNCIONES DE TEXT-TO-SPEECH (TTS) ---
 
 # 1. Función para ElevenLabs (Prioridad 1)
 def generar_audio_tts_elevenlabs(texto):
     # Si la API key es el placeholder o está vacía, no intentes llamar a la API
-    if not ELEVENLABS_API_KEY or ELEVENLABS_API_KEY == '8a0e5002acafa344bbe871dda4685fd0ef0f7663ae25cc9bb6c1bc5b1d51f133':
+    if not ELEVENLABS_API_KEY or ELEVENLABS_API_KEY == 'TU_API_KEY_DE_ELEVENLABS_AQUI':
         print("API Key de ElevenLabs no configurada. Omitiendo.")
         return None
     
@@ -129,7 +121,7 @@ def generar_audio_tts_elevenlabs(texto):
     try:
         url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
         headers = {
-            "xi-api-key": ELEVENLABS_API_KEY, 
+            "xi-api-key": ELEVENLABS_API_KEY,
             "Content-Type": "application/json"
         }
         payload = {
@@ -184,25 +176,24 @@ def index():
 def upload_audio():
     try:
         file = request.files['audio']
-        filename = "grabacion.webm" # Nombre fijo
+        filename = "grabacion.webm"
         file_path = os.path.join(UPLOAD_FOLDER, filename)
         file.save(file_path)
 
-        # Transcribir el audio (audio) a texto
-        segments, info = model.transcribe(file_path, language="es") # Forzar español
+        # Transcribir el audio a texto
+        segments, info = model.transcribe(file_path, language="es")
         original_text = " ".join([segment.text for segment in segments]).strip()
 
-        # Si se produce algun error no hay texto
         if not original_text:
             return jsonify({'error': 'No se detectó texto en el audio.'}), 400
 
-        # Obtener la respuesta de Ollama (phi3)
+        # Obtener la respuesta de Ollama
         respuesta = responder_con_ollana(original_text, model_name="phi3")
         
         # Guardar en el historial
         guardar_chat_historial(original_text, respuesta)
 
-        # CAMBIO REQ 4: Lógica de TTS (ElevenLabs primero, gTTS como fallback)
+        # Lógica de TTS (ElevenLabs primero, gTTS como fallback)
         tts_path = generar_audio_tts_elevenlabs(respuesta)
         if not tts_path:
             tts_path = generar_audio_tts_gtts(respuesta, idioma="es")
@@ -211,13 +202,13 @@ def upload_audio():
             "original": original_text,
             "asistente": respuesta,
             "tts_audio": '/tts/respuesta' if tts_path else None
-        }), 200  # HTTP 200 EXITO
+        }), 200
 
     except Exception as e:
         print(f"Error en /upload: {e}")
-        return jsonify({'error': str(e)}), 500  # HTTP 500 ERROR DEL SERVIDOR
+        return jsonify({'error': str(e)}), 500
 
-# CAMBIO REQ 1: Nueva ruta para procesar texto
+# Ruta para procesar texto
 @app.route('/chat-text', methods=['POST'])
 def chat_text():
     try:
@@ -227,13 +218,13 @@ def chat_text():
         if not original_text:
             return jsonify({'error': 'No se recibió texto.'}), 400
 
-        # Obtener la respuesta de Ollama (phi3)
+        # Obtener la respuesta de Ollama
         respuesta = responder_con_ollana(original_text, model_name="phi3")
         
         # Guardar en el historial
         guardar_chat_historial(original_text, respuesta)
 
-        # CAMBIO REQ 4: Lógica de TTS (ElevenLabs primero, gTTS como fallback)
+        # Lógica de TTS (ElevenLabs primero, gTTS como fallback)
         tts_path = generar_audio_tts_elevenlabs(respuesta)
         if not tts_path:
             tts_path = generar_audio_tts_gtts(respuesta, idioma="es")
@@ -242,7 +233,7 @@ def chat_text():
             "original": original_text,
             "asistente": respuesta,
             "tts_audio": '/tts/respuesta' if tts_path else None
-        }), 200  # HTTP 200 EXITO
+        }), 200
         
     except Exception as e:
         print(f"Error en /chat-text: {e}")
@@ -253,7 +244,6 @@ def chat_text():
 def servir_tts():
     audio_path = os.path.join(TTS_FOLDER, "respuesta.mp3")
     if os.path.exists(audio_path):
-        # Agregar 'no-cache' para evitar que el navegador guarde el audio antiguo
         response = send_file(audio_path, mimetype='audio/mpeg')
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response.headers['Pragma'] = 'no-cache'
