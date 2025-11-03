@@ -20,7 +20,7 @@ CLINIC_INFO_FILE = 'clinic_info.txt'  # archivo con info de la clínica
 
 # CAMBIO REQ 4: Configuración de ElevenLabs
 # !! IMPORTANTE: Reemplaza con tu clave de API real de ElevenLabs !!
-ELEVENLABS_API_KEY = 'TU_API_KEY_DE_ELEVENLABS_AQUI' 
+ELEVEN_API_KEY = '8a0e5002acafa344bbe871dda4685fd0ef0f7663ae25cc9bb6c1bc5b1d51f133'
 # Puedes encontrar IDs de voz aquí: https://api.elevenlabs.io/v1/voices
 VOICE_ID = '21m00Tcm4TlvDq8ikWAM'  # Voz predeterminada (Adam)
 ELEVEN_MODEL = 'eleven_multilingual_v2'  # Modelo actualizado para español
